@@ -1,0 +1,22 @@
+{
+  "name": "bookknow",
+  "version": "1.0.0",
+  "description": "ITC230 SU17 Advanced JavaScript web project. BookKnow is designed to help a reader find wonderful books.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silkspinner/ITC230.git"
+  },
+  "keywords": [
+    "book"
+  ],
+  "author": "Ron Nims",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/silkspinner/ITC230/issues"
+  },
+  "homepage": "https://github.com/silkspinner/ITC230#readme"
+}

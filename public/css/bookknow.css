@@ -1,0 +1,153 @@
+/* ITC230 Portal Website Styles */
+html {
+    background-color:#ccc;
+    font-family: 'Marko One', serif;
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Marko One', serif;
+}
+
+div.wrapper {
+    background-color:#f3f7e8;
+    width:90%;
+    margin:auto;
+    border:1px solid cornflowerblue;
+}
+
+img.icon {
+    height:50px;
+    padding: 0 .5em;
+}
+
+header h1 span {
+    padding: .25em 0;
+}
+
+h1 {
+    margin: .75em .25em .5em .25em;
+    font-size: 2.25em;
+}
+
+h2 {
+    margin: .75em .25em .5em .25em;
+    font-size: 1.75em;
+}
+
+h3 {
+    margin: .75em .25em .5em .25em;
+    font-size: 1.35em;
+}
+
+h1.banner {
+    vertical-align: middle;
+}
+
+.pageID {
+    font-size: 1.75em;
+}
+
+section {
+    padding: 0;
+}
+
+aside{
+    padding: 0;
+}
+
+footer {
+    padding: 1em;
+    text-align: center;
+}
+
+clear-float {
+    clear: both;
+}
+
+/* Embed Responsively Rules! */
+div.embed-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    margin: auto;
+    max-width: 98%;
+} 
+
+div.embed-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#showcase-flex {
+    display: flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+    justify-content:space-around;
+    align-items:center;
+}
+
+
+#body-flex {
+    display: flex;
+    flex-direction:row;
+    flex-wrap:nowrap;
+    justify-content:space-around;
+    align-items:flex-start;
+    margin:auto;
+}
+
+#body-content {
+    max-width: 60%;
+}
+
+#body-single {
+    max-width: 92%;
+    padding: 1em 2em;
+}
+
+aside {
+    max-width: 32%;
+}
+
+aside h3 {
+    padding-left: 2em;
+}
+
+aside li {
+    font-style:italic;
+}
+
+.pic-right {
+    float:right;
+    width: 33%;
+}
+
+.float-left {
+    float:left;    
+}
+
+.display {
+    border-color: cornflowerblue;
+    border-width: 2px;
+    border-style: solid;
+}
+
+@media screen and (max-width:680px) {
+
+    #body-flex {
+        flex-direction:column;
+        align-items:center;
+     }
+
+    #body-content {
+        max-width: 92%;
+    }
+
+    aside {
+        max-width: 92%;
+    }
+}
