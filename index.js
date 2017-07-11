@@ -26,34 +26,6 @@ function serveStaticFile(res, path, contentType, responseCode) {
 }
 
 /**
- * Format array of books as string for display
- * if list is empty display warning no match
- * @param array bookList
- * @return string
- */
-function formatBookList(bookList) {
-    var list = '-------------------------------------------\n';
-    if (bookList.length > 0) {
-        bookList.forEach( (book) => 
-        {
-            list += 'Title: ' + book.title + '\n';
-            list += 'Author: ' + book.author + '\n';
-            list += 'Publisher: ' + book.publisher + '\n';
-            list += 'Published Year: ' + book.year + '\n';
-            list += 'ISBN Number: ' + book.isbn + '\n';
-            if (book.volumes > 1) {
-                list += 'Volumes: ' + book.volumes + '\n';
-            }
-            list += '-------------------------------------------\n';
-        });
-    } else {
-         list += 'Warning: No book titles matched your query\n';
-         list += '-------------------------------------------\n';
-    }
-    return list;
-}
-
-/**
  * Create server
  * @param object req
  * @param object res
@@ -77,13 +49,13 @@ http.createServer(function(req,res) {
             
         case '/getall':
             res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end(formatBookList(books.byTitleAsc()));
+            res.end(books.byTitleAsc());
             break;
             
         case '/get':
             if (params.title) {
                 res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end(formatBookList(books.get(params.title)));
+                res.end(books.get(params.title));
             } else {
                 res.writeHead(422, { 'Content-Type': 'text/plain' });
                 res.end('422 Error - get request requires title parameter');
