@@ -90,6 +90,16 @@ http.createServer(function(req,res) {
             }
             break;
             
+        case '/add':
+            if (params.title) {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end(books.add(params));
+            } else {
+                res.writeHead(422, { 'Content-Type': 'text/plain' });
+                res.end('422 Error - add request requires at least title parameter');
+            }
+            break;
+            
         case '/delete':
             if (params.title) {
                 res.writeHead(200, { 'Content-Type': 'text/plain' });
