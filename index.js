@@ -1,6 +1,17 @@
 var http = require("http"),
+    qs = require("querystring"),
+    books = require("./lib/books.js"),
     fs = require("fs");
 
+const LISTEN_PORT = 3000;
+
+/**
+ * Serve a static file
+ * @param object res = HTTP response
+ * @param string path = path to file
+ * @param string contentType
+ * @param int responseCode
+ */
 function serveStaticFile(res, path, contentType, responseCode) {
     if(!responseCode) responseCode = 200;
     fs.readFile(__dirname + path, function(err, data) {
@@ -14,14 +25,48 @@ function serveStaticFile(res, path, contentType, responseCode) {
      });
 }
 
-http.createServer(function(req,res) {
-    // normalize URL
-    //   remove querystring, any trailing slash, them to LowerCase
-    var path = req.url.replace(/\/?(?:\?.*)?$/, '').toLowerCase();
+/**
+ * Format array of books as string for display
+ * if list is empty display warning no match
+ * @param array bookList
+ * @return string
+ */
+function formatBookList(bookList) {
+    var list = '-------------------------------------------\n';
+    if (bookList.length > 0) {
+        bookList.forEach( (book) => 
+        {
+            list += 'Title: ' + book.title + '\n';
+            list += 'Author: ' + book.author + '\n';
+            list += 'Publisher: ' + book.publisher + '\n';
+            list += 'Published Year: ' + book.year + '\n';
+            list += 'ISBN Number: ' + book.isbn + '\n';
+            if (book.volumes > 1) {
+                list += 'Volumes: ' + book.volumes + '\n';
+            }
+            list += '-------------------------------------------\n';
+        });
+    } else {
+         list += 'Warning: No book titles matched your query\n';
+         list += '-------------------------------------------\n';
+    }
+    return list;
+}
 
+/**
+ * Create server
+ * @param object req
+ * @param object res
+ */
+http.createServer(function(req,res) {
+    // build url, path and params object
+    let url = req.url.split("?"); // split the request URL
+    let params = qs.parse(url[1]); // create params
+    let path = url[0].toLowerCase(); // establish lowercased path
+   
     switch(path) {
 
-        case '':
+        case '/':
             serveStaticFile(res, '/public/home.html', 'text/html');
             break;
 
@@ -29,10 +74,35 @@ http.createServer(function(req,res) {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('ITC230 SU17 Advanced JavaSript\nApp Name: bookknow\nVersion : 1.0.0\n');
             break;
+            
+        case '/getall':
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end(formatBookList(books.byTitleAsc()));
+            break;
+            
+        case '/get':
+            if (params.title) {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end(formatBookList(books.get(params.title)));
+            } else {
+                res.writeHead(422, { 'Content-Type': 'text/plain' });
+                res.end('422 Error - get request requires title parameter');
+            }
+            break;
+            
+        case '/delete':
+            if (params.title) {
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end(books.delete(params.title));
+            } else {
+                res.writeHead(422, { 'Content-Type': 'text/plain' });
+                res.end('422 Error - delete request requires title parameter');
+            }
+            break;
 
         default:
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('404 Error - Resource Not Found: ' + path);
             break;
     }
-}).listen(process.env.PORT || 3000);
+}).listen(process.env.PORT || LISTEN_PORT);

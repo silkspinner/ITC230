@@ -1,8 +1,13 @@
 {
   "name": "bookknow",
-  "version": "1.0.0",
-  "description": "ITC230 SU17 Advanced JavaScript web project. BookKnow is designed to help a reader find wonderful books.",
+  "version": "1.0.1",
+  "description": "Book knowledge app, now with getall, get and delete routes",
   "main": "index.js",
+  "dependencies": {
+    "http": "^0.0.0",
+    "fs": "^0.0.1-security"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
