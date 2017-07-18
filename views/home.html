@@ -14,14 +14,14 @@
 <body>
 <div class="wrapper">
 <header>
-    <h1 class="banner"><span>Ron's ITC230 Portal</span></h1>
+    <h1 class="banner"><a href="home.html"></a><span>Ron's ITC230 Portal</span></h1>
     <nav>
         <ul class="topnav" id="myTopnav">
-            <li><a class="current" href="/"><i class="fa fa-home" aria-hidden="true"></i> Home</a></li>
-            <li><a class="current" href="/getall"><i class="fa fa-home" aria-hidden="true"></i> Show All</a></li>
-            <li><a class="current" href="/about"><i class="fa fa-home" aria-hidden="true"></i> About</a></li>
+            <li><a class="current"  href="/"><i class="fa fa-home" aria-hidden="true"></i> Home</a></li>
+            <li><a class="current" href="/getall"><i class="fa fa-folder-open" aria-hidden="true"></i> Show All</a></li>
+            <li><a class="current" href="/addbook"><i class="fa fa-book" aria-hidden="true"></i> Add Book</a></li>
+            <li><a class="current" href="/about"><i class="fa fa-question-circle-o" aria-hidden="true"></i> About</a></li>
         </ul>
-
     </nav>
 </header>
   
@@ -49,11 +49,17 @@
     
     <!-- START RIGHT COL -->
         <aside>
-         <h3>Developer Axioms</h3>
-
-             <p><q>Get comfortable being uncomfortable</q></p>
-             <p><q>Know when to say NO</q></p>
-             <p><q>Code never lies, comments sometimes do</q></p>
+            <h3>Current Book Titles</h3>
+            <hr>
+            {{#if results}}
+                {{#each results}}
+                    <a href="/detail?searchtext={{this.title}}">{{this.title}}</a><br/>
+                {{/each}}
+            {{else}}
+                <hr>
+                No book titles available
+            {{/if}}
+            <hr>
 
         </aside>
     <!-- END RIGHT COL -->

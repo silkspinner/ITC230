@@ -1,90 +1,103 @@
-var http = require("http"),
-    qs = require("querystring"),
+'use strict'
+let qs = require("querystring"),
+    handlebars = require("express-handlebars"),
     books = require("./lib/books.js"),
     fs = require("fs");
 
-const LISTEN_PORT = 3000;
+const http = require("http"),
+      express = require("express"),
+      app = express(),
+      LISTEN_PORT = 3000,
+      TEXT_HTML = 'text/html',
+      TEXT_PLAIN = 'text/plain';
 
-/**
- * Serve a static file
- * @param object res = HTTP response
- * @param string path = path to file
- * @param string contentType
- * @param int responseCode
- */
-function serveStaticFile(res, path, contentType, responseCode) {
-    if(!responseCode) responseCode = 200;
-    fs.readFile(__dirname + path, function(err, data) {
-       if(err)  {
-           res.writeHead(500, { 'Content-Type': 'text/plain' });
-           res.end('500 - Internal Error');
-       } else {
-           res.writeHead(responseCode, { 'Content-Type': contentType });
-           res.end(data, 'utf-8');
-       } 
-     });
-}
+// initialize express configuration
+app.set('port', process.env.PORT || LISTEN_PORT);
+app.use(express.static(__dirname + '/public'));
+app.use(require("body-parser").urlencoded({extended: true}));
+// initialize render engine
+app.engine(".html", handlebars({extname: '.html'}));
+app.set("view engine", ".html");
 
-/**
- * Create server
- * @param object req
- * @param object res
- */
-http.createServer(function(req,res) {
-    // build url, path and params object
-    let url = req.url.split("?"); // split the request URL
-    let params = qs.parse(url[1]); // create params
-    let path = url[0].toLowerCase(); // establish lowercased path
-   
-    switch(path) {
+// initialize express configuration
+app.set('port', process.env.PORT || LISTEN_PORT);
+app.use(express.static(__dirname + '/public'));
+app.use(require("body-parser").urlencoded({extended: true}));
 
-        case '/':
-            serveStaticFile(res, '/public/home.html', 'text/html');
-            break;
+// ***** DEFINE ROUTES *****
 
-        case '/about':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end('ITC230 SU17 Advanced JavaSript\nApp Name: bookknow\nVersion : 1.0.0\n');
-            break;
-            
-        case '/getall':
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end(books.byTitleAsc());
-            break;
-            
-        case '/get':
-            if (params.title) {
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end(books.get(params.title));
-            } else {
-                res.writeHead(422, { 'Content-Type': 'text/plain' });
-                res.end('422 Error - get request requires title parameter');
-            }
-            break;
-            
-        case '/add':
-            if (params.title) {
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end(books.add(params));
-            } else {
-                res.writeHead(422, { 'Content-Type': 'text/plain' });
-                res.end('422 Error - add request requires at least title parameter');
-            }
-            break;
-            
-        case '/delete':
-            if (params.title) {
-                res.writeHead(200, { 'Content-Type': 'text/plain' });
-                res.end(books.delete(params.title));
-            } else {
-                res.writeHead(422, { 'Content-Type': 'text/plain' });
-                res.end('422 Error - delete request requires title parameter');
-            }
-            break;
+// ROUTE: home page
+app.get('/', (req,res) => {
+    let booklist = books.byTitleAsc();
+    res.render('home', { results: booklist});
+});
 
-        default:
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end('404 Error - Resource Not Found: ' + path);
-            break;
-    }
-}).listen(process.env.PORT || LISTEN_PORT);
+// ROUTE: add book page
+app.get('/addbook', (req,res) => {
+    let booklist = books.byTitleAsc();
+    res.render('addbook', { results: booklist});
+});
+
+// ROUTE: about page
+app.get('/about', (req,res) => {
+    let bookcount = books.count();
+    res.render('about', {bookcount: bookcount});
+});
+
+// ROUTE: getall page
+app.get('/getall', (req,res) => {
+    let booklist = books.byTitleAsc();
+    res.render('details-all', { results: booklist});
+});
+
+// ROUTE: detail page
+app.get('/detail', (req,res) => {
+    let booklist = books.get(req.query.searchtext);
+    res.render('details', {searchtext: req.query.searchtext, results: booklist});
+});
+
+// ROUTE: add page
+app.get('/add', (req,res) => {
+    let results = books.add({title: req.query.title,
+                            author: req.query.author,
+                            publisher: req.query.publisher,
+                            year: req.query.year,
+                            isbn: req.query.isbn,
+                            volumes: req.query.volumes});
+    res.render('add', {results: results});
+});
+
+// ROUTE: delete page
+app.get('/delete', (req,res) => {
+    let results = books.delete(req.query.title);
+    res.render('delete', {results: results});
+});
+
+// ***** DEFINE ERROR HANDLING *****
+
+// ERROR: 404 handler
+app.use((req,res) => {
+    res.type(TEXT_PLAIN);
+    res.status(404);
+    res.send('404 Error - Resource Not Found');
+});
+
+// ERROR: 500 handler
+app.use((req,res) => {
+    res.type(TEXT_PLAIN);
+    res.status(500);
+    res.send('500 Error - Internal Server Error');
+});
+
+// ERROR: 503 handler
+app.use((req,res) => {
+    res.type(TEXT_PLAIN);
+    res.status(503);
+    res.send('503 Error - Service Unavailable');
+});
+
+// ***** START SERVER *****
+
+app.listen(app.get('port'), () => {
+    console.log('Express Started');
+});

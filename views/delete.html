@@ -14,14 +14,14 @@
 <body>
 <div class="wrapper">
 <header>
-    <h1 class="banner"><span>Ron's ITC230 Portal</span></h1>
+    <h1 class="banner"><a href="home.html"></a><span>Ron's ITC230 Portal</span></h1>
     <nav>
         <ul class="topnav" id="myTopnav">
-            <li><a class="current" href="/"><i class="fa fa-home" aria-hidden="true"></i> Home</a></li>
-            <li><a class="current" href="/getall"><i class="fa fa-home" aria-hidden="true"></i> Show All</a></li>
-            <li><a class="current" href="/about"><i class="fa fa-home" aria-hidden="true"></i> About</a></li>
+            <li><a class="current"  href="/"><i class="fa fa-home" aria-hidden="true"></i> Home</a></li>
+            <li><a class="current" href="/getall"><i class="fa fa-folder-open" aria-hidden="true"></i> Show All</a></li>
+            <li><a class="current" href="/addbook"><i class="fa fa-book" aria-hidden="true"></i> Add Book</a></li>
+            <li><a class="current" href="/about"><i class="fa fa-question-circle-o" aria-hidden="true"></i> About</a></li>
         </ul>
-
     </nav>
 </header>
   
@@ -29,34 +29,15 @@
 
     <!-- START LEFT COL -->
     <section id="body-content">
-    <h2 class="pageID">ITC230 Advanced JavaScript</h2>
-        
-    <h3>App Name: <i>bookknow</i></h3>
-        
-        <p><b>BookKnow</b> - is an amazing web app that uses the marvelous magic of
-            the interwebs.</p>
-        
-        <form action="/detail"  method="get">
-            <label for="searchtext">Title Search</label>
-            <input type="text" name="searchtext" size="36" required>
-            <input type="submit" value="Search">
-        </form>
+        <h2 class="pageID">Book Know App</h2>
+        <h3>** Delete Book Process **</h3>
+        <h4>{{results}}</h4>
     </section>
     
     
     <!-- END LEFT COL -->
 
-    
-    <!-- START RIGHT COL -->
-        <aside>
-         <h3>Developer Axioms</h3>
 
-             <p><q>Get comfortable being uncomfortable</q></p>
-             <p><q>Know when to say NO</q></p>
-             <p><q>Code never lies, comments sometimes do</q></p>
-
-        </aside>
-    <!-- END RIGHT COL -->
 </div>
 
 <!-- START Footer -->

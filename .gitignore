@@ -1,2 +1,4 @@
+.gitignore
 # node ignores
 node_modules
+*.bak
