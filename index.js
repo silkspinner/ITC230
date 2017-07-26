@@ -1,28 +1,24 @@
-'use strict'
-let qs = require("querystring"),
-    handlebars = require("express-handlebars"),
-    books = require("./lib/books.js"),
-    fs = require("fs");
+'use strict';
+let handlebars = require('express-handlebars'),
+    books = require('./lib/books.js');
 
-const http = require("http"),
-      express = require("express"),
-      app = express(),
-      LISTEN_PORT = 3000,
-      TEXT_HTML = 'text/html',
-      TEXT_PLAIN = 'text/plain';
+const express = require('express'),
+    app = express(),
+    LISTEN_PORT = 3000,
+    TEXT_PLAIN = 'text/plain';
 
 // initialize express configuration
 app.set('port', process.env.PORT || LISTEN_PORT);
 app.use(express.static(__dirname + '/public'));
-app.use(require("body-parser").urlencoded({extended: true}));
+app.use(require('body-parser').urlencoded({extended: true}));
 // initialize render engine
-app.engine(".html", handlebars({extname: '.html'}));
-app.set("view engine", ".html");
+app.engine('.html', handlebars({extname: '.html'}));
+app.set('view engine', '.html');
 
 // initialize express configuration
 app.set('port', process.env.PORT || LISTEN_PORT);
 app.use(express.static(__dirname + '/public'));
-app.use(require("body-parser").urlencoded({extended: true}));
+app.use(require('body-parser').urlencoded({extended: true}));
 
 // ***** DEFINE ROUTES *****
 
@@ -58,12 +54,14 @@ app.get('/detail', (req,res) => {
 
 // ROUTE: add page
 app.get('/add', (req,res) => {
-    let results = books.add({title: req.query.title,
-                            author: req.query.author,
-                            publisher: req.query.publisher,
-                            year: req.query.year,
-                            isbn: req.query.isbn,
-                            volumes: req.query.volumes});
+    let results = books.add(
+        {title: req.query.title,
+            author: req.query.author,
+            publisher: req.query.publisher,
+            year: req.query.year,
+            isbn: req.query.isbn,
+            volumes: req.query.volumes}
+    );
     res.render('add', {results: results});
 });
 
