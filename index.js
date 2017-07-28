@@ -9,11 +9,11 @@
  */
 
 'use strict';
-let handlebars = require('express-handlebars'),
-    _ = require('underscore'),
-    Book = require('./models/Book.js');
 
 const express = require('express'),
+    handlebars = require('express-handlebars'),
+    _ = require('underscore'),
+    Book = require('./models/Book.js'),
     app = express(),
     LISTEN_PORT = 3000,
     TEXT_PLAIN = 'text/plain',
