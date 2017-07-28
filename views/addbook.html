@@ -29,26 +29,33 @@
 
     <!-- START LEFT COL -->
     <section id="body-content">
-    <h2 class="pageID">ITC230 Advanced JavaScript</h2>
-
-    <h3>App Name: <i>bookknow</i></h3>
-
-        <h4>Add a new title to our book list</h4>
+        <h2>ITC230 Advanced JavaScript</h2>
+        <h3>Book Know App</h3>
+        <h4>Add a new option to our book list</h4>
 
         <form action="/add"  method="get">
-            <label for="title">Title: </label>
-            <input type="text" name="title" size="36"><br/>
-            <label for="author">Author: </label>
-            <input type="text" name="author" size="36"><br/>
-            <label for="publisher">Publisher: </label>
-            <input type="text" name="publisher" size="36"><br/>
-            <label for="year">Year: </label>
-            <input type="number" name="year" maxlength="3" min="1800" max="2025"><br/>
-            <label for="isbn">ISBN: </label>
-            <input type="text" name="isbn" size="13"><br/>
-            <label for="volumes">Volumes: </label>
-            <input type="number" name="volumes" maxlength="1" min="1" max="99" value="1"><br/>
-            <input type="submit" value="Add Book">
+            <table><tbody>
+            <tr>
+            <td class="align-right"><label for="title">Title: </label>
+            <td><input type="text" name="title" size="36"></td>
+            </tr><tr>
+            <td class="align-right"><label for="author">Author: </label></td>
+            <td><input type="text" name="author" size="36"><br/></td>
+            </tr><tr>
+            <td class="align-right"><label for="publisher">Publisher: </label></td>
+            <td><input type="text" name="publisher" size="36"><br/></td>
+            </tr><tr>
+            <td class="align-right"><label for="pubdate">Pub Date: </label></td>
+            <td><input type="date" name="pubdate" size="4"><br/></td>
+            </tr><tr>
+            <td class="align-right"><label for="isbn">ISBN: </label></td>
+            <td><input type="text" name="isbn" size="13"><br/></td>
+            </tr><tr>
+            <td class="align-right"><label for="volumes">Volumes: </label></td>
+            <td><input type="number" name="volumes" min="1" value="1"></td>
+            </tr><tr><td></td>
+            <td colspan="2" class="align-center"><input type="submit" value="Add Book"></td>
+            <tr></tbody></table>
         </form>
     </section>
 

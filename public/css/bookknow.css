@@ -74,6 +74,11 @@ div.embed-container {
     max-width: 98%;
 } 
 
+input[type="number"] {
+	padding-left: 1em;
+    width: 2.5em;
+}
+
 div.embed-container iframe {
     position: absolute;
     top: 0;
@@ -134,6 +139,14 @@ aside li {
     border-color: cornflowerblue;
     border-width: 2px;
     border-style: solid;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.align-center {
+    text-align: center;
 }
 
 @media screen and (max-width:680px) {

@@ -29,24 +29,25 @@
 
     <!-- START LEFT COL -->
     <section id="body-content">
-    <h2 class="pageID">Book Know App</h2>
-    <h3>Details about Books that match: {{searchtext}}</h3>
-        
-    {{#if results}}
-        {{#each results}}
+        <h2>ITC230 Advanced JavaScript</h2>
+        <h3>Book Know App</h3>
+        <h3>Details about Books that match: {{searchtext}}</h3>
+
+        {{#if results}}
+            {{#each results}}
+                <hr>
+                Title: {{this.title}}<br>
+                Author: {{this.author}}<br>
+                Publisher: {{this.publisher}}<br>
+                Pub Date: {{this.pubdate}} - Volumes: {{this.volumes}}<br> 
+                ISBN: {{this.isbn}}<br> 
+                <a href="/delete?title={{this.title}}">DELETE</a>
+            {{/each}}
+        {{else}}
             <hr>
-            Title: {{this.title}}<br>
-            Author: {{this.author}}<br>
-            Publisher: {{this.publisher}}<br>
-            Year: {{this.year}} - Volumes: {{this.volumes}}<br> 
-            ISBN: {{this.isbn}}<br> 
-            <a href="/delete?title={{this.title}}">DELETE</a>
-        {{/each}}
-    {{else}}
+            No book titles matched your search
+        {{/if}}
         <hr>
-        No book titles matched your search
-    {{/if}}
-    <hr>
     </section>
     
     

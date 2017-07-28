@@ -29,9 +29,15 @@
 
     <!-- START LEFT COL -->
     <section id="body-content">
-        <h2 class="pageID">Book Know App</h2>
-        <h3>** Delete Book Process **</h3>
-        <h4>{{results}}</h4>
+        <h2>ITC230 Advanced JavaScript</h2>
+        <h3>Book Know App</h3>
+        <h3>Title: "{{title}}"</h3>
+        {{#if result}}
+            <h4>Book was successfully removed</h4>
+        {{else}}
+            <h4>Error: Book could not be removed</h4>
+        {{/if}}
+        <h4>There are {{total}} books remaining</h4>
     </section>
     
     

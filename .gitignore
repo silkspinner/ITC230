@@ -2,3 +2,4 @@
 # node ignores
 node_modules
 *.bak
+connection.js
