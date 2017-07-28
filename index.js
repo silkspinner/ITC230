@@ -38,7 +38,8 @@ app.use(require('body-parser').urlencoded({extended: true}));
 app.get('/', (req, res, next) => {
     Book.find({}, function (err, booklist) {
         if (err) return next(err);
-        res.render('home', { results: booklist});
+        booklist = _.sortBy(booklist, 'title');
+        res.render('home', { layout: 'main', results: booklist});
     });
 });
 
@@ -46,7 +47,8 @@ app.get('/', (req, res, next) => {
 app.get('/about', (req, res, next) => {
     Book.find({}, function (err, booklist) {
         if (err) return next(err);
-        res.render('about', { bookcount: booklist.length});
+        booklist = _.sortBy(booklist, 'title');
+        res.render('about', { layout: 'main', bookcount: booklist.length, results: booklist});
     });
 });
 
@@ -56,7 +58,7 @@ app.get('/getall', (req, res, next) => {
     Book.find({}, function (err, booklist) {
         if (err) return next(err);
         booklist = _.sortBy(booklist, 'title');
-        res.render('details-all', { results: booklist});
+        res.render('details-all', { layout: 'main', results: booklist});
     });
 });
 
@@ -65,7 +67,8 @@ app.get('/detail', (req, res, next) => {
     var find_regex = new RegExp( req.query.searchtext, "i");
     Book.find({"title": {$regex:find_regex }}, function (err, booklist) {
         if (err) return next(err);
-        res.render('details', {searchtext: req.query.searchtext, results: booklist});
+        booklist = _.sortBy(booklist, 'title');
+        res.render('details', { layout: 'main', searchtext:                 req.query.searchtext, results: booklist});
     });
 });
 
@@ -77,7 +80,7 @@ app.get('/delete', (req, res, next) => {
       
         Book.count((err, total) => {
             res.type(TEXT_HTML);
-            res.render('delete', {title: req.query.title, result: delresult, total: total.toString() } );    
+            res.render('delete', { layout: 'main', title: req.query.title, result: delresult, total: total.toString() } );    
         });
     });
 });
@@ -87,7 +90,8 @@ app.get('/delete', (req, res, next) => {
 app.get('/addbook', (req, res, next) => {
     Book.find({}, function (err, booklist) {
         if (err) return next(err);
-        res.render('addbook', { results: booklist});
+        booklist = _.sortBy(booklist, 'title');
+        res.render('addbook', { layout: 'main', results: booklist});
     });
 });
 
@@ -119,7 +123,10 @@ app.get('/add', (req,res) => {
       
         Book.count((err, total) => {
             res.type(TEXT_HTML);
-            res.render('add', {title: req.query.title, result: addresult, total: total.toString() } );    
+            res.render('add', {layout: 'main',
+                               title: req.query.title,
+                               result: addresult,
+                               total: total.toString() } );    
         });
 
     });

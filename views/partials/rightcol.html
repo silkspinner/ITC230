@@ -1,0 +1,16 @@
+<!-- START RIGHT COL -->
+    <aside>
+        <h3>Current Book Titles</h3>
+        <hr>
+        {{#if results}}
+            {{#each results}}
+                <a href="/detail?searchtext={{this.title}}">{{this.title}}</a><br/>
+            {{/each}}
+        {{else}}
+            <hr>
+            No book titles available
+        {{/if}}
+        <hr>
+
+    </aside>
+<!-- END RIGHT COL -->
