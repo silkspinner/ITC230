@@ -13,6 +13,7 @@
 const express = require('express'),
     handlebars = require('express-handlebars'),
     _ = require('underscore'),
+    cors = require('cors'),
     Book = require('./models/Book.js'),
     app = express(),
     LISTEN_PORT = 3000,
@@ -31,6 +32,9 @@ app.set('view engine', '.html');
 app.set('port', process.env.PORT || LISTEN_PORT);
 app.use(express.static(__dirname + '/public'));
 app.use(require('body-parser').urlencoded({extended: true}));
+
+// set Access-Control-Allow-Origin header
+app.use('/api', require('cors')()); 
 
 // ***** DEFINE ROUTES *****
 
@@ -62,13 +66,38 @@ app.get('/getall', (req, res, next) => {
     });
 });
 
+// ROUTE: getall page
+app.get('/api/getall', (req, res, next) => {
+    Book.find({}, function (err, booklist) {
+        if (err) {
+            res.json(err);           
+        } else {
+            booklist = _.sortBy(booklist, 'title');
+            res.json(booklist);
+        }
+    });
+});
+
 // ROUTE: detail page
 app.get('/detail', (req, res, next) => {
     var find_regex = new RegExp( req.query.searchtext, "i");
     Book.find({"title": {$regex:find_regex }}, function (err, booklist) {
         if (err) return next(err);
         booklist = _.sortBy(booklist, 'title');
-        res.render('details', { layout: 'main', searchtext:                 req.query.searchtext, results: booklist});
+        res.render('details', { layout: 'main', searchtext: req.query.searchtext, results: booklist});
+    });
+});
+
+// ROUTE: detail page
+app.get('/api/detail', (req, res, next) => {
+    var find_regex = new RegExp( req.query.searchtext, "i");
+    Book.find({"title": {$regex:find_regex }}, function (err, booklist) {
+        if (err) {
+            res.json(err);           
+        } else {
+            booklist = _.sortBy(booklist, 'title');
+            res.json(booklist);
+        }
     });
 });
 
@@ -77,11 +106,23 @@ app.get('/delete', (req, res, next) => {
     Book.remove({ title:req.query.title }, (err, result) => {
         if (err) return next(err);
         let delresult = result.result.n !== 0;
-      
-        Book.count((err, total) => {
-            res.type(TEXT_HTML);
-            res.render('delete', { layout: 'main', title: req.query.title, result: delresult, total: total.toString() } );    
-        });
+        if (delresult) {
+            Book.count((err, total) => {
+                res.type(TEXT_HTML);
+                res.render('delete', { layout: 'main', title: req.query.title, result: delresult, total: total.toString() } );    
+            });
+        }
+    });
+});
+
+// ROUTE: delete page
+app.get('/api/delete', (req, res, next) => {
+    Book.remove({ title:req.query.title }, (err, result) => {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(result);
+        }
     });
 });
 
@@ -110,24 +151,49 @@ app.get('/editbook', (req, res, next) => {
 app.get('/add', (req,res) => {
     
     let title = req.query.title;
-    Book.update({ title: title}, {title:title,
-                                  author: req.query.author,
-                                  publisher: req.query.publisher,
-                                  pubdate: req.params.pubdate,
-                                  isbn: req.query.isbn,
-                                  volumes: req.query.volumes
-                                 }, {upsert: true },
-                (err, result) => {
+    Book.update({ title: title},
+        {title:title,
+        author: req.query.author,
+        publisher: req.query.publisher,
+        pubdate: req.params.pubdate,
+        isbn: req.query.isbn,
+        volumes: req.query.volumes
+        }, {upsert: true },
+    (err, result) => {
         if (err) return next(err);
         let addresult = result;
       
         Book.count((err, total) => {
             res.type(TEXT_HTML);
-            res.render('add', {layout: 'main',
-                               title: req.query.title,
-                               result: addresult,
-                               total: total.toString() } );    
+            res.render('add',
+                {layout: 'main',
+                title: req.query.title,
+                result: addresult,
+                total: total.toString() }
+            );    
         });
+
+    });
+});
+
+// ROUTE: add page
+app.get('/api/add', (req,res) => {
+    
+    let title = req.query.title;
+    Book.update({ title: title},
+        {title:title,
+        author: req.query.author,
+        publisher: req.query.publisher,
+        pubdate: req.params.pubdate,
+        isbn: req.query.isbn,
+        volumes: req.query.volumes
+        }, {upsert: true},
+    (err, result) => {
+        if (err) {
+            res.json(err);      
+        } else {
+            res.json(result);
+        }
 
     });
 });
