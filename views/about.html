@@ -1,12 +1,168 @@
-<!-- START LEFT COL -->
-<section id="body-content">
-    <h2>ITC230 Advanced JavaScript</h2>
-    <h3>Book Know App</h3>
+<!doctype html>
+<html>
+<head>
+    <title>ITC-230 Nodejs Web App</title>
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta charset="utf-8">
+    <link href="/css/bookknow.css" rel="stylesheet">
+    <link href="/css/nav.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Marko+One" rel="stylesheet">
+    <script src="https://use.fontawesome.com/c2f787031b.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js"></script>
+ 
+</head>
+<body>
+<div class="wrapper">
+    <div id="root" ></div>
 
-    <h3>Version: 1.0.2</h3>
-    <h3>Current book count: {{bookcount}}</h3>
-</section>
+    <!-- NOTE: text/babel type required to support JSX -->
+    <script type="text/babel">
 
-<!-- END LEFT COL -->
+        // primary BookAbout component
+        class BookAbout extends React.Component{
+            constructor(props){
+                super(props); // instantiate parent class
+                // Set initial state using data from server application
+                this.state = {
+                    books: {{{booklist}}},
+                };
 
-{{> rightcol}}
+            }
+            
+
+            render() {
+                // render UI elements
+                return (
+                    <div>
+                    <PageHeader />
+                        
+                    <div id="body-flex">
+                        <section id="body-content">
+                            <PageTitle title="ITC230 Advanced JavaScript"/>
+                            <Description text="is an amazing web app that uses the marvelous magic of the interwebs."/>
+
+                        </section>
+
+                        <aside>
+                            <ListTitle title="Current Book Titles"/>  
+                            <BookList
+                                books={this.state.books}
+                            />
+                        </aside>
+
+                    </div>
+
+                    <PageFooter />
+                    </div>
+                );
+            }
+        }
+        
+        // UI elements
+                    
+        const PageHeader = () => {
+                        
+            const PageHeadline = ({headline}) => {
+                return (
+                    <h1>{headline}</h1>
+                );
+            }
+                        
+            const PageNav = () => {
+                return (
+                    <nav>
+                        <ul className="topnav">
+                            <li><a className="current"  href="/"><i className="fa fa-home" aria-hidden="true"></i> Home</a></li>
+                            <li><a className="current" href="/about"><i className="fa fa-question-circle-o" aria-hidden="true"></i> About</a></li>
+                        </ul>
+                    </nav>
+                );
+            }
+            
+            return (
+                <div>
+                    <PageHeadline headline="Ron's ITC230 Portal"/>
+                    <PageNav />
+                </div>
+            );
+        }
+                            
+        const PageFooter = () => {
+
+            return (
+                <footer>
+                  <p><small>&copy; 2016 -
+                    2017 by <a href="http://artdevsign.com/adz" target="_blank">Artemisia Devsign, Ron Nims</a>, All Rights Reserved </small></p>
+                </footer>
+            );
+        }
+
+        
+        
+        const AppName = ({name}) => {
+            return (
+                <b>{name}</b>
+            );
+        }                    
+
+
+        const PageTitle = ({title}) => {
+
+            const ClassTitle = ({classtitle}) => {
+                return (
+                    <h2>{classtitle}</h2>
+                );
+            }
+            return (
+                <section id="body-content">
+                    <h2>{title}</h2>
+                    <h3><AppName name="Book Know"/> App</h3>
+
+                    <h3>Version: 1.1.0</h3>
+                </section>
+            );
+        }
+
+        const Description = ({text}) => {
+
+            return (
+                <p>
+                    <AppName name="Book Know"/> {text}
+                </p>
+            );
+        } 
+
+        const ListTitle = ({title}) => {
+            return (
+                <div>
+                    <h3>{title}</h3>
+                </div>
+            );
+        }
+
+        const BookList = (props) => {
+            // return items that match search entry field, or all items if no entry
+            const bookNodes = props.books.map((book) => {
+                return <p key={book._id} id={book._id}>{book.title}</p>
+            });
+            return <div id="book-list">{bookNodes}</div>;
+        }
+            
+        ReactDOM.render(<BookAbout />, document.getElementById('root'));
+
+        // convert date value to yyyy-mm-dd expected by HTML5 date field
+        function getISOstring(dateString) {
+            let date = (dateString) ? new Date(dateString) : new Date();
+            let month = (date.getMonth() >=9) ? date.getMonth()+1 : "0" + (date.getMonth()+1);
+            let day = (date.getDate() >=10) ? date.getDate() : "0" + date.getDate();
+            return date.getFullYear() + "-" + month + "-" + day;    
+        }
+
+    </script>
+</div> <!-- opening wrapper div -->
+</body>
+</html>

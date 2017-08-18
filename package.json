@@ -1,6 +1,6 @@
 {
   "name": "bookknow",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Book knowledge app, now with getall, get and delete routes",
   "main": "index.js",
   "dependencies": {

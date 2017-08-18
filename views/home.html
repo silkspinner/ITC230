@@ -1,18 +1,311 @@
-<!-- START LEFT COL -->
-<section id="body-content">
-    <h2>ITC230 Advanced JavaScript</h2>
-    <h3>Book Know App</h3>
+<!doctype html>
+<html>
+<head>
+    <title>ITC-230 Nodejs Web App</title>
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta charset="utf-8">
+    <link href="/css/bookknow.css" rel="stylesheet">
+    <link href="/css/nav.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Marko+One" rel="stylesheet">
+    <script src="https://use.fontawesome.com/c2f787031b.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.0/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.6.0/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js"></script>
+ 
+</head>
+<body>
+<div class="wrapper">
+    <div id="root" ></div>
 
-    <p><b>Book Know</b> - is an amazing web app that uses the marvelous magic of
-        the interwebs.</p>
+    <!-- NOTE: text/babel type required to support JSX -->
+    <script type="text/babel">
 
-    <form action="/detail"  method="get">
-        <label for="searchtext">Title Search</label>
-        <input type="text" name="searchtext" size="36" required>
-        <input type="submit" value="Search">
-    </form>
-</section>
+        // primary bookknow component
+        class BookKnow extends React.Component{
+            constructor(props){
+                super(props); // instantiate parent class
+                // Set initial state using data from server application
+                this.state = {
+                    books: {{{booklist}}},
+                    search: "", // search text 
+                    curBook: {} // current selected item 
+                };
+                // bind App context to functions used by child components
+                this.onSearchChange = this.onSearchChange.bind(this);
+                this.onChange = this.onChange.bind(this);
+                this.onSave = this.onSave.bind(this);
+                this.onDelete = this.onDelete.bind(this);
+                this.onClear = this.onClear.bind(this);
+                this.onSearchClear = this.onSearchClear.bind(this);
+            }
+            
+            // handle search form change
+            onSearchChange(event) {
+                // set search filter term
+                this.setState({search: event.target.value.toLowerCase() });
+            }
 
-<!-- END LEFT COL -->
+            // handle search form change
+            onSearchClear() {
+                // set search text
+                this.setState({search: "" });
+            }
 
-{{> rightcol}}
+            // clear bookdetails form
+            onClear() {
+                this.setState({curBook: {}});
+            }
+
+            // show book details when clicked from list
+            showDetails(event){
+                // event.target is chosen book
+                let editBook = this.state.books.find((book) => {
+                    return book._id == event.target.id;
+                });
+                this.setState({curBook: editBook});
+            }
+            // handle detail changes
+            onChange(event) {
+                var newBook = this.state.curBook;
+                newBook[event.target.name] = event.target.value
+                this.setState({curBook: newBook});
+            }
+
+            // handle book delete
+            onDelete(){
+                let id = this.state.curBook._id;
+
+                fetch("/api/delete/" + id).then((response) => {
+                    return response.json();
+                }).then((results) => {
+                    // Filter all items except the one to be removed
+                    const newBookList = this.state.books.filter((book) => {
+                        return book._id !== id;
+                    });
+                    // Update state with new array
+                    this.setState({books: newBookList, curBook: {}});
+                });
+            }
+
+            // handle item save
+            onSave() {
+                let newBook = this.state.curBook;
+                if (!newBook.title) {
+                    return;
+                }
+
+                fetch("/api/add/", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newBook)
+                }).then(res => res.json())
+                    .then((json) => {
+                        let newData;
+                        if (!newBook._id) { // add new item to array
+                            newData = this.state.books;
+                            newBook._id = json._id;
+                            newData.push(newBook);
+                        } else { // update existing item 
+                            newData = this.state.books.map((book) => {
+                            if (book._id === newBook._id) {
+                                book = newBook; 
+                            }
+                            return book;
+                        });
+                    }
+
+                    // Update state with new array
+                    this.setState({books: newData});
+                });
+            }
+
+            render() {
+                // render UI elements
+                return (
+                    <div>
+                    <PageHeader />
+                        
+                    <div id="body-flex">
+                        <section id="body-content">
+                            <PageTitle title="App"/>
+                            <Description text="is an amazing web app that uses the marvelous magic of the interwebs."/>
+                            <SearchForm
+                                search={this.state.search}
+                                change={this.onSearchChange}
+                                clear={this.onSearchClear}
+                            />
+                            <BookDetails
+                                book={this.state.curBook}
+                                change={this.onChange}
+                                save={this.onSave}
+                                reset={this.onClear}
+                                delete={this.onDelete}
+                            />
+                        </section>
+
+                        <aside>
+                            <ListTitle title="Current Book Titles"/>  
+                            <BookList
+                                books={this.state.books}
+                                search={this.state.search}
+                                book={this.state.curBook}
+                                show={this.showDetails.bind(this)}
+                            />
+                        </aside>
+
+                    </div>
+
+                    <PageFooter />
+                    </div>
+                );
+            }
+        }
+        
+        // UI elements
+                    
+        const PageHeader = () => {
+                        
+            const PageHeadline = ({headline}) => {
+                return (
+                    <h1>{headline}</h1>
+                );
+            }
+                        
+            const PageNav = () => {
+                return (
+                    <nav>
+                        <ul className="topnav">
+                            <li><a className="current"  href="/"><i className="fa fa-home" aria-hidden="true"></i> Home</a></li>
+                            <li><a className="current" href="/about"><i className="fa fa-question-circle-o" aria-hidden="true"></i> About</a></li>
+                        </ul>
+                    </nav>
+                );
+            }
+            
+            return (
+                <div>
+                    <PageHeadline headline="Ron's ITC230 Portal"/>
+                    <PageNav />
+                </div>
+            );
+        }
+                            
+        const PageFooter = () => {
+
+            return (
+                <footer>
+                  <p><small>&copy; 2016 -
+                    2017 by <a href="http://artdevsign.com/adz" target="_blank">Artemisia Devsign, Ron Nims</a>, All Rights Reserved </small></p>
+                </footer>
+            );
+        }
+
+        
+        
+        const AppName = ({name}) => {
+            return (
+                <b>{name}</b>
+            );
+        }                    
+
+
+        const PageTitle = ({title}) => {
+
+            const ClassTitle = ({classtitle}) => {
+                return (
+                    <h2>{classtitle}</h2>
+                );
+            }
+            return (
+                <div>
+                    <ClassTitle classtitle="ITC230 Advanced Javascript"/>
+                    <h3><AppName name="Book Know"/> {title}</h3>
+                </div>
+            );
+        }
+
+        const Description = ({text}) => {
+
+            return (
+                <p>
+                    <AppName name="Book Know"/> {text}
+                </p>
+            );
+        } 
+
+        const SearchForm = (props) => {
+            return (
+                <div>
+                    <span>Title Search </span>
+                    <input
+                        type="text" placeholder="Enter a search term"
+                        value={props.search}
+                        onChange={props.change}
+                    />
+                    <button id="clear" onClick={props.clear}>Clear Search</button>
+                </div>
+            );
+        }
+
+        const ListTitle = ({title}) => {
+            return (
+                <div>
+                    <h3>{title}</h3>
+                </div>
+            );
+        }
+
+        const BookList = (props) => {
+            // return items that match search entry field, or all items if no entry
+            const bookNodes = props.books.map((book) => {
+                if (!props.search || book.title.toLowerCase().includes(props.search)) { 
+                    return <p key={book._id} id={book._id} onClick={props.show}>{book.title}</p>
+                    }
+                });
+            return <div id="book-list">{bookNodes}</div>;
+        }
+        
+        const BookDetails = (props) => {
+            return (
+                <span id="book-details">
+                    <h4>Book Details:</h4>
+                    <form onChange={props.change}>
+                        <table><tbody>
+                        <tr><td className="align-right"><label htmlFor="title">Title</label></td>
+                        <td><input type="text" name="title" size="36" placeholder="title" value={props.book.title || ""} /></td></tr>
+                        <tr><td className="align-right"><label htmlFor="author">Author</label></td>
+                        <td><input type="text" name="author" size="36" placeholder="author" value={props.book.author || ""} /></td></tr>
+                        <tr><td className="align-right"><label htmlFor="publisher">Publisher</label></td>
+                        <td><input type="text" name="publisher" size="36" placeholder="publisher" value={props.book.publisher || ""} /></td></tr>
+                        <tr><td className="align-right"><label htmlFor="pubdate">Publish Date</label></td>
+                        <td><input type="date" name="pubdate" size="4" placeholder="publish date" value={getISOstring(props.book.pubdate)} /></td></tr>
+                        <tr><td className="align-right"><label htmlFor="isbn">ISBN</label></td>
+                        <td><input type="text" name="isbn" placeholder="ISBN" size="13" value={props.book.isbn || ""} /></td></tr>
+                        <tr><td className="align-right"><label htmlFor="volumes">Volumes</label></td>
+                        <td><input type="number" name="volumes" value={props.book.volumes || "1"} /></td></tr>
+                        </tbody></table>
+                    </form>
+                    <button id="reset" onClick={props.reset}>Reset Form</button>
+                    <button id="save" onClick={props.save}>Save Book</button>
+                    <button id="delete" onClick={props.delete}>Delete Book</button>
+                </span>
+            );
+        }
+
+            
+        ReactDOM.render(<BookKnow />, document.getElementById('root'));
+
+        // convert date value to yyyy-mm-dd expected by HTML5 date field
+        function getISOstring(dateString) {
+            let date = (dateString) ? new Date(dateString) : new Date();
+            let month = (date.getMonth() >=9) ? date.getMonth()+1 : "0" + (date.getMonth()+1);
+            let day = (date.getDate() >=10) ? date.getDate() : "0" + date.getDate();
+            return date.getFullYear() + "-" + month + "-" + day;    
+        }
+
+    </script>
+</div> <!-- opening wrapper div -->
+</body>
+</html>

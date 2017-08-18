@@ -15,23 +15,25 @@ const express = require('express'),
     _ = require('underscore'),
     cors = require('cors'),
     Book = require('./models/Book.js'),
-    app = express(),
-    LISTEN_PORT = 3000,
+    app = express();
+
+const LISTEN_PORT = 3000,
     TEXT_PLAIN = 'text/plain',
     TEXT_HTML = 'text/html';
+
+const bodyParser = require('body-parser');
 
 // initialize express configuration
 app.set('port', process.env.PORT || LISTEN_PORT);
 app.use(express.static(__dirname + '/public'));
-app.use(require('body-parser').urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
+
 // initialize render engine
 app.engine('.html', handlebars({extname: '.html'}));
 app.set('view engine', '.html');
 
-// initialize express configuration
-app.set('port', process.env.PORT || LISTEN_PORT);
-app.use(express.static(__dirname + '/public'));
-app.use(require('body-parser').urlencoded({extended: true}));
 
 // set Access-Control-Allow-Origin header
 app.use('/api', require('cors')()); 
@@ -43,7 +45,8 @@ app.get('/', (req, res, next) => {
     Book.find({}, function (err, booklist) {
         if (err) return next(err);
         booklist = _.sortBy(booklist, 'title');
-        res.render('home', { layout: 'main', results: booklist});
+        console.log(booklist);
+        res.render('home', {booklist: JSON.stringify(booklist)}); 
     });
 });
 
@@ -52,21 +55,12 @@ app.get('/about', (req, res, next) => {
     Book.find({}, function (err, booklist) {
         if (err) return next(err);
         booklist = _.sortBy(booklist, 'title');
-        res.render('about', { layout: 'main', bookcount: booklist.length, results: booklist});
+        console.log(booklist);
+        res.render('about', {booklist: JSON.stringify(booklist)}); 
     });
 });
 
-
-// ROUTE: getall page
-app.get('/getall', (req, res, next) => {
-    Book.find({}, function (err, booklist) {
-        if (err) return next(err);
-        booklist = _.sortBy(booklist, 'title');
-        res.render('details-all', { layout: 'main', results: booklist});
-    });
-});
-
-// ROUTE: getall page
+// ROUTE: API getall
 app.get('/api/getall', (req, res, next) => {
     Book.find({}, function (err, booklist) {
         if (err) {
@@ -78,17 +72,7 @@ app.get('/api/getall', (req, res, next) => {
     });
 });
 
-// ROUTE: detail page
-app.get('/detail', (req, res, next) => {
-    var find_regex = new RegExp( req.query.searchtext, "i");
-    Book.find({"title": {$regex:find_regex }}, function (err, booklist) {
-        if (err) return next(err);
-        booklist = _.sortBy(booklist, 'title');
-        res.render('details', { layout: 'main', searchtext: req.query.searchtext, results: booklist});
-    });
-});
-
-// ROUTE: detail page
+// ROUTE: API detail
 app.get('/api/detail', (req, res, next) => {
     var find_regex = new RegExp( req.query.searchtext, "i");
     Book.find({"title": {$regex:find_regex }}, function (err, booklist) {
@@ -101,101 +85,45 @@ app.get('/api/detail', (req, res, next) => {
     });
 });
 
-// ROUTE: delete page
-app.get('/delete', (req, res, next) => {
-    Book.remove({ title:req.query.title }, (err, result) => {
+// ROUTE: API delete
+app.get('/api/delete/:id', (req, res, next) => {
+    Book.remove({"_id":req.params.id }, (err, result) => {
         if (err) return next(err);
-        let delresult = result.result.n !== 0;
-        if (delresult) {
-            Book.count((err, total) => {
-                res.type(TEXT_HTML);
-                res.render('delete', { layout: 'main', title: req.query.title, result: delresult, total: total.toString() } );    
-            });
-        }
+        // return # of items deleted
+        res.json({"deleted": result.result.n});
     });
 });
 
-// ROUTE: delete page
-app.get('/api/delete', (req, res, next) => {
-    Book.remove({ title:req.query.title }, (err, result) => {
-        if (err) {
-            res.json(err);
-        } else {
-            res.json(result);
-        }
-    });
-});
+// ROUTE: API add
+app.post('/api/add/', (req, res, next) => {
+    // if new book then instantiate new Book and save  
 
-
-// ROUTE: add book page
-app.get('/addbook', (req, res, next) => {
-    Book.find({}, function (err, booklist) {
-        if (err) return next(err);
-        booklist = _.sortBy(booklist, 'title');
-        res.render('addbook', { layout: 'main', results: booklist});
-    });
-});
-
-/* TODO
-// ROUTE: edit book page
-app.get('/editbook', (req, res, next) => {
-    var find_regex = new RegExp( req.query.title, "i");
-    Book.find({"title": {$regex:find_regex }}, function (err, book) {
-        if (err) return next(err);
-        res.render('editbook', {results: book});
-    });
-});
-*/
-
-// ROUTE: add page
-app.get('/add', (req,res) => {
-    
-    let title = req.query.title;
-    Book.update({ title: title},
-        {title:title,
-        author: req.query.author,
-        publisher: req.query.publisher,
-        pubdate: req.params.pubdate,
-        isbn: req.query.isbn,
-        volumes: req.query.volumes
-        }, {upsert: true },
-    (err, result) => {
-        if (err) return next(err);
-        let addresult = result;
-      
-        Book.count((err, total) => {
-            res.type(TEXT_HTML);
-            res.render('add',
-                {layout: 'main',
-                title: req.query.title,
-                result: addresult,
-                total: total.toString() }
-            );    
+    if (!req.body._id) { // insert new document
+       
+        let book = new Book({title:req.body.title,
+                            author: req.body.author,
+                            publisher: req.body.publisher,
+                            pubdate: req.body.pubdate,
+                            isbn: req.body.isbn,
+                            volumes: req.body.volumes
+                            });
+        book.save((err, newBook) => {
+            if (err) return next(err);
+            res.json({updated: 0, _id: newBook._id});
         });
-
-    });
-});
-
-// ROUTE: add page
-app.get('/api/add', (req,res) => {
-    
-    let title = req.query.title;
-    Book.update({ title: title},
-        {title:title,
-        author: req.query.author,
-        publisher: req.query.publisher,
-        pubdate: req.params.pubdate,
-        isbn: req.query.isbn,
-        volumes: req.query.volumes
-        }, {upsert: true},
-    (err, result) => {
-        if (err) {
-            res.json(err);      
-        } else {
-            res.json(result);
-        }
-
-    });
+    } else { // update existing book
+        Book.updateOne({ _id: req.body._id},
+                       {title:req.body.title,
+                        author: req.body.author,
+                        publisher: req.body.publisher,
+                        pubdate: req.body.pubdate,
+                        isbn: req.body.isbn,
+                        volumes: req.body.volumes
+                         }, (err, result) => {
+            if (err) return next(err);
+            res.json({updated: result.nModified, _id: req.body._id});
+        });
+    }    
 });
 
 // ***** DEFINE ERROR HANDLING *****
